@@ -1,6 +1,6 @@
-# gogs-in-dokku
+# gitea-in-dokku
 
-A walkthrough for running Gogs in Dokku.
+A walkthrough for running Gitea in Dokku.
 
 # Requirements
 
@@ -10,9 +10,9 @@ A walkthrough for running Gogs in Dokku.
 
 ## Start a Dokku VM
 
-To get a Dokku instance quickly up and running, I've created a [Vagrantfile](https://github.com/cstroe/gogs-in-dokku/blob/master/Vagrantfile) and [provision.sh](https://github.com/cstroe/gogs-in-dokku/blob/master/provision.sh) that creates a VM with Dokku installed.  
+To get a Dokku instance quickly up and running, I've created a [Vagrantfile](https://github.com/rvasilev/gitea-in-dokku/blob/master/Vagrantfile) and [provision.sh](https://github.com/rvasilev/gitea-in-dokku/blob/master/provision.sh) that creates a VM with Dokku installed.
 
-**NOTE**: You can use the same commands from [provision.sh](https://github.com/cstroe/gogs-in-dokku/blob/master/provision.sh) to install Dokku on your Ubuntu 16.04 server if you don't want to use Vagrant.
+**NOTE**: You can use the same commands from [provision.sh](https://github.com/rvasilev/gitea-in-dokku/blob/master/provision.sh) to install Dokku on your Ubuntu 16.04 server if you don't want to use Vagrant.
 
 To create the VM simply type:
 
@@ -38,43 +38,42 @@ Fill out the following information:
 
 ## Postgres Dokku Plugin
 
-Because Gogs requires a database, we can use the Postgres plugin for Dokku to manage our database container.  From inside the Vagrant VM (via `vagrant ssh`), type the following:
+Because Gitea requires a database, we can use the Postgres plugin for Dokku to manage our database container.  From inside the Vagrant VM (via `vagrant ssh`), type the following:
 
     sudo dokku plugin:install https://github.com/dokku/dokku-postgres.git
 
 
-## Deploy Gogs
+## Deploy Gitea
 
-We will run Gogs from the dockerhub.com image.  Inside the Vagrant VM, start by creating the application and our database:
+We will run Gitea from the dockerhub.com image.  Inside the Vagrant VM, start by creating the application and our database:
 
-    dokku apps:create gogs
-    dokku postgres:create gogs-db
-    dokku postgres:link gogs-db gogs
+    dokku apps:create gitea
+    dokku postgres:create gitea-db
+    dokku postgres:link gitea-db gitea
 
-We need to save the Gogs files in a volume so that we don't lose our Git repositories between application restarts:
+We need to save the Gitea files in a volume so that we don't lose our Git repositories between application restarts:
 
     sudo mkdir /var/lib/dokku/data/storage/gogs_data
     sudo chown root:root /var/lib/dokku/data/storage/gogs_data
-    dokku storage:mount gogs /var/lib/dokku/data/storage/gogs_data:/data
+    dokku storage:mount gitea /var/lib/dokku/data/storage/gogs_data:/data
 
-We also need to use a custom proxy port for Gogs, since our system SSH service is already listening on port `22`:
+We also need to use a custom proxy port for Gitea, since our system SSH service is already listening on port `22`:
 
-    dokku proxy:ports-add gogs http:2222:22
-    dokku proxy:ports-remove gogs http:22:22
+    dokku proxy:ports-add gitea http:2222:22
+    dokku proxy:ports-remove gitea http:22:22
 
 Now we can pull and deploy the Docker image from dockerhub:
 
-    docker pull gogs/gogs:latest
-    docker tag gogs/gogs:latest dokku/gogs:latest
-    dokku tags:deploy gogs latest
+    docker pull gitea/gitea:latest
+    docker tag gitea/gitea:latest dokku/gitea:latest
+    dokku tags:deploy gitea latest
 
-## Configure Gogs
+## Configure Gitea
 
-***IMPORTANT***: Currently, there is a Dokku bug that does not properly expose the HTTP port of Gogs.
+***IMPORTANT***: Currently, there is a Dokku bug that does not properly expose the HTTP port of Gitea.
 
-To configure Gogs, you need to browse to Gogs' HTTP port and finish the Gogs setup.  All the database configuration can be see by issuing:
+To configure Gitea, you need to browse to Gitea' HTTP port and finish the Gitea setup.  All the database configuration can be see by issuing:
 
-    dokku postgres:info gogs-db
+    dokku postgres:info gitea-db
 
 Note the `Dsn:` entry, as it contains the username, password, hostname, port, and database name of the Postgres server.
-
