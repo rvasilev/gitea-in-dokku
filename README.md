@@ -2,6 +2,13 @@
 
 A walkthrough for running Gitea in Dokku.
 
+---
+# Navigation
+ * [Requirements](#requirements)
+ * [Configure Dokku](#configure)
+ * [Deploy Gitea](#deploy)
+ * [References](#references)
+
 # Requirements
 
 * VirtualBox 5.0+
@@ -77,3 +84,12 @@ To configure Gitea, you need to browse to Gitea' HTTP port and finish the Gitea 
     dokku postgres:info gitea-db
 
 Note the `Dsn:` entry, as it contains the username, password, hostname, port, and database name of the Postgres server.
+
+# References
+
+ 1. [gogs-in-dokku]
+ 1. [TUTORIAL: DEPLOYING GOGS TO DOKKU]
+
+[gogs-in-dokku]: https://github.com/cstroe/gogs-in-dokku
+
+[TUTORIAL: DEPLOYING GOGS TO DOKKU]:https://dokku.github.io/tutorials/deploying-gogs-to-dokku
