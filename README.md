@@ -77,7 +77,9 @@ Now we can pull and deploy the Docker image from dockerhub:
 
 ## Configure Gitea
 
-***IMPORTANT***: Currently, there is a Dokku bug that does not properly expose the HTTP port of Gitea.
+***IMPORTANT***: Currently, there is a Dokku bug that does not properly expose the HTTP port of Gitea. To bypass it we will manualy proxy internal http port:
+
+    dokku proxy:ports-add gogs http:80:3000
 
 To configure Gitea, you need to browse to Gitea' HTTP port and finish the Gitea setup.  All the database configuration can be see by issuing:
 
