@@ -1,58 +1,23 @@
 # gitea-in-dokku
 
-A walkthrough for running Gitea in Dokku.
+A walkthrough for running [Gitea](https://gitea.io/en-us/) in [Dokku](http://dokku.viewdocs.io/dokku/).
 
 ---
-# Navigation
- * [Requirements](#requirements)
- * [Configure Dokku](#configure)
- * [Deploy Gitea](#deploy)
- * [References](#references)
 
-# Requirements
+## Requirements
 
-* VirtualBox 5.0+
-* Vagrant (optional)
-* Ubuntu Xenial (16.04)
-
-## Start a Dokku VM
-
-To get a Dokku instance quickly up and running, I've created a [Vagrantfile](https://github.com/rvasilev/gitea-in-dokku/blob/master/Vagrantfile) and [provision.sh](https://github.com/rvasilev/gitea-in-dokku/blob/master/provision.sh) that creates a VM with Dokku installed.
-
-**NOTE**: You can use the same commands from [provision.sh](https://github.com/rvasilev/gitea-in-dokku/blob/master/provision.sh) to install Dokku on your Ubuntu 16.04 server if you don't want to use Vagrant.
-
-To create the VM simply type:
-
-    vagrant up
-
-The provisioning will take about 10 minutes.  Once it's done, you can ssh into the vagrant VM to inspect the networking configuration of the VM:
-
-    vagrant ssh
-    ifconfig -a | grep inet
-
-### Notes
-
-* The `Vagrantfile` bridges to `eth0`, expecting that it will be your external network interface.  This allows the VM to get an external IP.  You can disable this to use the NAT interface only.
-
-## Configure Dokku
-
-Dokku requires some configuration after installing and this is done via a one-time install web page.  Simply browse to the Dokku server via its IP or hostname.  For example, if the external IP is `192.168.1.102`, you should browse to `http://192.168.1.102` in your browser to finish the Dokku configuration.
-
-Fill out the following information:
-* The public SSH key that you want to use for git access to Dokku.  If in doubt, use the contents of `~/.ssh/id_rsa.pub` to allow yourself access from your machine.
-* If you have control over your local DNS (such as with [OpenWrt](https://openwrt.org/)), you can set the hostname of the Dokku box, and enable virtualhost naming for apps.  Otherwise, just use the IP.
-* Click `Finish Setup` when you're done.
+* working box with Dokku installed and configured
+* Postgres or MySQL Dokku Plugin
 
 ## Postgres Dokku Plugin
 
-Because Gitea requires a database, we can use the Postgres plugin for Dokku to manage our database container.  From inside the Vagrant VM (via `vagrant ssh`), type the following:
+Because Gitea requires a database, we can use the Postgres plugin for Dokku to manage our database container.  From inside dokku box, type the following:
 
     sudo dokku plugin:install https://github.com/dokku/dokku-postgres.git
 
-
 ## Deploy Gitea
 
-We will run Gitea from the dockerhub.com image.  Inside the Vagrant VM, start by creating the application and our database:
+We will run Gitea from the dockerhub.com image.  Inside the box, start by creating the application and our database:
 
     dokku apps:create gitea
     dokku postgres:create gitea-db
@@ -77,7 +42,7 @@ Now we can pull and deploy the Docker image from dockerhub:
 
 ## Configure Gitea
 
-***IMPORTANT***: Currently, there is a Dokku bug that does not properly expose the HTTP port of Gitea. To bypass it we will manualy proxy internal http port:
+***IMPORTANT***: Currently, there is a Dokku bug that does not properly expose the HTTP port. To bypass it we will manualy proxy internal http port:
 
     dokku proxy:ports-add gitea http:80:3000
 
